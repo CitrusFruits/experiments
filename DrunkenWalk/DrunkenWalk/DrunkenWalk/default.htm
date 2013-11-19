@@ -1,0 +1,24 @@
+﻿<html>
+<head>
+    <title>Drunken Walk</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <style type="text/css"></style>
+</head>
+<body style="">
+    <div>
+        <input id="gridWidth" value="50">Grid Width<br>
+        <input id="gridHeight" value="50">Grid Height<br>
+        <input id="numSteps" value="150">Number of Steps<br>
+        <input id="centralization" value="0.2">Centralization<br>
+        <input id="scale" value="1">Scale<br>
+        <button onclick="updateStats(); drawGrid(drunkenWalk(stats.gridWidth/2, stats.gridHeight/2, stats.numSteps, stats.centralization))">Generate</button>
+        <br>
+        <div id="canvasHolder">
+
+        </div>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/DrunkenWalk.js"></script>
+
+    </div>
+</body>
+</html>
