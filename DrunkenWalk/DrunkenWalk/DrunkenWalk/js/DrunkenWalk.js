@@ -1,4 +1,5 @@
 //<reference path="jquery.d.ts"/>
+//<reference path="GameMap.ts"/>
 var stats = {
     gridHeight: 0,
     gridWidth: 0,
@@ -13,11 +14,12 @@ function updateStats() {
     stats.centralization = $("#centralization").val();
 }
 
-function drunkenWalk(posX, posY, numSteps, centralization, grid) {
-    if (grid == undefined)
-        grid = getEmptyGrid(stats.gridWidth, stats.gridHeight);
-else
-        grid = grid;
+/**
+*
+*/
+function drunkenWalk(posX, posY, numSteps, centralization, map) {
+    if (map == undefined)
+        map = new GameMap(stats.gridWidth, stats.gridHeight);
 
     var size = $("#scale").val() * 5;
     var pi = 3 + 1 / 7;
@@ -69,14 +71,13 @@ else
         }
 
         //console.log(posX + " " + posY);
-        grid[posX][posY] = '#444';
+        map.setElement(posX, posY, '#444');
     }
-    return grid;
+    return map;
 }
 
-/*
-* eq should be an equation in the
-* from of y=f(x);
+/**
+* Returns a continuous path, using the given equation
 */
 function getPathFromEq(eq, startX, endX) {
     var path = new Array();
@@ -88,54 +89,28 @@ function getPathFromEq(eq, startX, endX) {
     return path;
 }
 
-function addPathToGrid(grid, path) {
+function addPathToMap(map, path) {
     for (var x = 0; x < path.length; x++) {
-        grid[x][path[x]] = "#ff0000";
+        map.setElement(x, path[x], "#ff0000");
     }
-    return grid;
+    return map;
 }
 
-function addPathDrunkenlyToGrid(grid, path) {
+function addPathDrunkenlyToMap(map, path) {
     for (var x = 0; x < path.length; x++) {
-        grid = drunkenWalk(x, path[x], 100, 0, grid);
-    }
-    return grid;
-}
-
-function getEmptyGrid(width, height) {
-    var grid = new Array();
-    for (var i = 0; i < width; i++) {
-        grid[i] = new Array();
-        for (var j = 0; j < height; j++) {
-            grid[i][j] = '#000';
+        if (x != 0) {
+            map.addLine(x - 1, path[x - 1], x, path[x], "#ff0000");
+            map.addLine(x, path[x - 1], x + 1, path[x], "#ff0000");
         }
+        map = drunkenWalk(x, path[x], 100, 0, map);
     }
-    return grid;
-}
-
-function drawGrid(grid) {
-    var size = $("#scale").val() * 5;
-
-    //drawing
-    var canv = document.createElement("canvas");
-    canv.width = stats.gridWidth * size;
-    canv.height = stats.gridHeight * size;
-    var ctx = canv.getContext("2d");
-    for (var i = 0; i < stats.gridWidth; i++) {
-        for (var j = 0; j < stats.gridHeight; j++) {
-            //console.log(i + " " + j + " " + grid[i][j]);
-            ctx.fillStyle = grid[i][j];
-            ctx.fillRect(i * size, (stats.gridHeight - j - 1) * size, size, size);
-        }
-    }
-    $("#canvasHolder").html("");
-    $("#canvasHolder").append(canv);
+    return map;
 }
 
 updateStats();
 
 //drawGrid(drunkenWalk(stats.gridWidth/2, stats.gridHeight/2, stats.numSteps, stats.centralization));
-var grid = getEmptyGrid(stats.gridWidth, stats.gridHeight);
-grid = addPathDrunkenlyToGrid(grid, getPathFromEq("y=x", 0, stats.gridWidth));
-drawGrid(grid);
+var grid = new GameMap(stats.gridWidth, stats.gridHeight);
+grid = addPathDrunkenlyToMap(grid, getPathFromEq("y=x", 0, stats.gridWidth));
+grid.draw();
 //# sourceMappingURL=DrunkenWalk.js.map

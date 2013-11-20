@@ -22,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="js\DrunkenWalk.ts" />
-    <TypeScriptCompile Include="js\Map.ts" />
+    <TypeScriptCompile Include="js\GameMap.ts" />
     <TypeScriptCompile Include="js\jquery.d.ts" />
   </ItemGroup>
   <ItemGroup>

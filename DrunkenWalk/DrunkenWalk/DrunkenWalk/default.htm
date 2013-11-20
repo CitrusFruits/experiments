@@ -11,14 +11,22 @@
         <input id="numSteps" value="150">Number of Steps<br>
         <input id="centralization" value="0.2">Centralization<br>
         <input id="scale" value="1">Scale<br>
-        <button onclick="updateStats(); drawGrid(drunkenWalk(stats.gridWidth/2, stats.gridHeight/2, stats.numSteps, stats.centralization))">Generate</button>
+        <button onclick="updateStats(); regenerateMap()">Generate</button>
         <br>
         <div id="canvasHolder">
 
         </div>
         <script src="js/jquery.min.js"></script>
+        <script src="js/GameMap.js"></script>
         <script src="js/DrunkenWalk.js"></script>
 
     </div>
 </body>
 </html>
+<script>
+    regenerateMap = function(){
+        var map = new GameMap(stats.gridWidth, stats.gridHeight);
+        drunkenWalk(stats.gridWidth / 2, stats.gridHeight / 2, stats.numSteps, stats.centralization, map);
+        map.draw();
+    }
+</script>

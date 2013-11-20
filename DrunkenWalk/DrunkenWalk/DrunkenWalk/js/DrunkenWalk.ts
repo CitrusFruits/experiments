@@ -1,4 +1,5 @@
 //<reference path="jquery.d.ts"/>
+//<reference path="GameMap.ts"/>
 var stats = {
     gridHeight: 0,
     gridWidth: 0,
@@ -13,12 +14,13 @@ function updateStats() {
     stats.centralization = $("#centralization").val();
 }
 
-function drunkenWalk(posX: number, posY: number, numSteps: number, centralization: number, grid: Array<Array<string>>) {
+/**
+ * 
+ */
+function drunkenWalk(posX: number, posY: number, numSteps: number, centralization: number, map: GameMap): GameMap {
     //fake overloaded constructor
-    if (grid == undefined)
-      grid = getEmptyGrid(stats.gridWidth, stats.gridHeight);
-    else
-        grid = grid;
+    if (map == undefined)
+      map = new GameMap(stats.gridWidth, stats.gridHeight);
 
     var size = $("#scale").val() * 5;
     var pi = 3 + 1 / 7;
@@ -73,18 +75,15 @@ function drunkenWalk(posX: number, posY: number, numSteps: number, centralizatio
             }
         }
         //console.log(posX + " " + posY);
-        grid[posX][posY] = '#444';
+        map.setElement(posX, posY, '#444');
     }
-    return grid;
+    return map;
 }
 
-
-
-/*
- * eq should be an equation in the
- * from of y=f(x);
+/**
+ * Returns a continuous path, using the given equation
  */
-function getPathFromEq(eq, startX, endX) {
+function getPathFromEq(eq: string, startX: number, endX: number): Array<number> {
     var path = new Array();
     var y;
     for (var x = startX; x < endX; x++) {
@@ -95,54 +94,27 @@ function getPathFromEq(eq, startX, endX) {
 }
 
 
-function addPathToGrid(grid, path) {
+function addPathToMap(map: GameMap, path: Array<number>) : GameMap {
     for (var x = 0; x < path.length; x++) {
-        grid[x][path[x]] = "#ff0000";
+        map.setElement(x, path[x], "#ff0000");
     }
-    return grid;
+    return map;
 }
 
-function addPathDrunkenlyToGrid(grid, path) : Array<Array<string>>{
+function addPathDrunkenlyToMap(map: GameMap, path) : GameMap{
     for (var x = 0; x < path.length; x++) {
-        grid = drunkenWalk(x, path[x], 100, 0, grid);
-    }
-    return grid;
-}
-
-
-function getEmptyGrid(width, height): Array<Array<string>>{
-    var grid = new Array();
-    for (var i = 0; i < width; i++) {
-        grid[i] = new Array();
-        for (var j = 0; j < height; j++) {
-            grid[i][j] = '#000';
+        if (x != 0) {
+            map.addLine(x - 1, path[x - 1], x, path[x], "#ff0000");
+            map.addLine(x, path[x - 1], x+1, path[x], "#ff0000");
         }
+        map = drunkenWalk(x, path[x], 100, 0, map);
     }
-    return grid;
-}
-
-function drawGrid(grid) {
-    var size = $("#scale").val() * 5;
-
-    //drawing
-    var canv = document.createElement("canvas");
-    canv.width = stats.gridWidth * size;
-    canv.height = stats.gridHeight * size;
-    var ctx = canv.getContext("2d");
-    for (var i = 0; i < stats.gridWidth; i++) {
-        for (var j = 0; j < stats.gridHeight; j++) {
-            //console.log(i + " " + j + " " + grid[i][j]);
-            ctx.fillStyle = grid[i][j];
-            ctx.fillRect(i * size, (stats.gridHeight - j - 1) * size, size, size);
-        }
-    }
-    $("#canvasHolder").html("");
-    $("#canvasHolder").append(canv);
+    return map;
 }
 
 updateStats();
 //drawGrid(drunkenWalk(stats.gridWidth/2, stats.gridHeight/2, stats.numSteps, stats.centralization));
 
-var grid = getEmptyGrid(stats.gridWidth, stats.gridHeight);
-grid = addPathDrunkenlyToGrid(grid, getPathFromEq("y=x", 0, stats.gridWidth))
-            drawGrid(grid);
+var grid = new GameMap(stats.gridWidth, stats.gridHeight);
+grid = addPathDrunkenlyToMap(grid, getPathFromEq("y=x", 0, stats.gridWidth))
+grid.draw();
